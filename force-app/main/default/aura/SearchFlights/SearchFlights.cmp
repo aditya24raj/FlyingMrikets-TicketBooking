@@ -1,0 +1,50 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId" access="global" controller="SearchFlights">
+    <aura:handler name="init" value="{!this}" action="{!c.fetchFromAirports}"/>
+
+    <!--attributes-->
+    <aura:attribute name="fromAirports" type="Airport__c[]"/>
+    <aura:attribute name="toAirports" type="Airport__c[]"/>
+    <aura:attribute name="passengerTypes" type="String[]" default="['Adult', 'Children', 'Infant', 'Senior Citizen']"/>
+        
+    <!--card holding all the input fields & search button-->
+    <lightning:card title="Search Flights" iconName="standard:search">
+        
+        <!--search flights button-->
+        <aura:set attribute="actions">
+            <lightning:button label="Search Flights" title="Neutral action" onclick=""/>
+        </aura:set>
+
+        <!--input fields start here-->
+
+        <!--From-->
+        <div style="padding: 15px !important; margin-top: -10px !important">
+            <lightning:select aura:id="selectFrom" label="From" onfocus="{!c.fetchToAirports}" onchange="{!c.fetchToAirports}">
+                <aura:iteration items="{!v.fromAirports}" var="fromAirport">
+                    <option text="{!fromAirport.Name}" value="{!fromAirport.Id}"></option>
+                </aura:iteration>
+            </lightning:select>
+        </div>
+
+        <!--To-->
+        <div style="padding: 15px !important; margin-top: -25px !important">
+            <lightning:select aura:id="selectTo" label="To">
+                <aura:iteration items="{!v.toAirports}" var="toAirport">
+                    <option text="{!toAirport.Name}" value="{!toAirport.Id}"></option>
+                </aura:iteration>
+            </lightning:select>
+        </div>
+        
+        <!--Passenger Type-->
+        <div style="padding: 15px !important; margin-top: -25px !important">
+            <lightning:select aura:id="selectPassengerType" label="Passenger">
+                <aura:iteration items="{!v.passengerTypes}" var="passengerType">
+                    <option text="{!passengerType}" value="{!passengerType}"></option>
+                </aura:iteration>
+            </lightning:select>
+        </div>
+    </lightning:card>
+
+    <!--Flight Result Header-->
+
+
+</aura:component>	
