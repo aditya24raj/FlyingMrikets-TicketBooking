@@ -60,7 +60,9 @@
                 <div id="{!'section' + availableflight.Id}" class="slds-section">
                     <h3 class="slds-section__title">
                       <button id="{!availableflight.Id}" aria-controls="{!'content' + availableflight.Id}" aria-expanded="false" class="slds-button slds-section__title-action" onclick="{!c.sectionExpand}">
-                        <span class="slds-truncate" title="Section Title">Section Title</span>
+                        <span class="slds-truncate" title="Section Title">
+                            <lightning:formattedDateTime class="departTime" value="{!availableflight.Depart_Time__c}" hour="2-digit" minute="2-digit"/> <span style="color:darkgrey !important">&nbsp;&nbsp; ●----{!availableflight.Duration__c}---->  &nbsp;&nbsp;</span> <lightning:formattedDateTime class="departTime" value="{!availableflight.Arrival_Time__c}" hour="2-digit" minute="2-digit"/> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span>{!availableflight.Name}</span>
+                        </span>
                       </button>
                     </h3>
                     <div id="{!'content' + availableflight.Id}" aria-hidden="true" class="slds-section__content">
