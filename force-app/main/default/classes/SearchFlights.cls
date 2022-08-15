@@ -26,4 +26,9 @@ public with sharing class SearchFlights {
              WHERE Onboarding_From__r.Id = :airportFromId AND Arriving_To__r.Id = :airportToId
         ];
     }
+
+    @AuraEnabled
+    public static List<Fare__c> getFares(String flightId, String PassengerType){
+        return [SELECT Name, Price__c FROM Fare__c WHERE Flight__r.Id = :flightId AND Passenger_Type__c = :PassengerType];
+    }
 }
