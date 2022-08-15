@@ -1,3 +1,7 @@
 .THIS .departTime {
     font-weight: bold !important;
 }
+
+.THIS button > * {
+    pointer-events: none;
+}

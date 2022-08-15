@@ -58,14 +58,14 @@
         <div style="padding: 15px !important; margin-top: -10px !important">
             <aura:iteration items="{!v.availableFlights}" var="availableflight">
                 <div id="{!'section' + availableflight.Id}" class="slds-section">
-                    <h3 class="slds-section__title">
+                    <h3 class="slds-section__title" style="border: 0.5px solid darkgrey; border-radius: 5px">
                       <button id="{!availableflight.Id}" aria-controls="{!'content' + availableflight.Id}" aria-expanded="false" class="slds-button slds-section__title-action" onclick="{!c.sectionExpand}">
                         <span class="slds-truncate" title="Section Title">
                             <lightning:formattedDateTime class="departTime" value="{!availableflight.Depart_Time__c}" hour="2-digit" minute="2-digit"/> <span style="color:darkgrey !important">&nbsp;&nbsp; ●----{!availableflight.Duration__c}---->  &nbsp;&nbsp;</span> <lightning:formattedDateTime class="departTime" value="{!availableflight.Arrival_Time__c}" hour="2-digit" minute="2-digit"/> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span>{!availableflight.Name}</span>
                         </span>
                       </button>
                     </h3>
-                    <div id="{!'content' + availableflight.Id}" aria-hidden="true" class="slds-section__content">
+                    <div id="{!'content' + availableflight.Id}" aria-hidden="true" class="slds-section__content" style="border: 2px solid rgb(1,118, 211); border-radius: 5px; margin-top: 5px; padding: 10px">
                       <p>Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                         Nullam quis risus eget urna mollis ornare vel eu leo. Nulla vitae elit libero, a pharetra augue.</p>
                     </div>
