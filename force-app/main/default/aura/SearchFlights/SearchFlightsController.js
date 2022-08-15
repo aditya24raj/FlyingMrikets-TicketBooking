@@ -68,7 +68,7 @@
         action.setCallback(this, function(response) {
             if (response.getState() == "SUCCESS") {
                 console.log(response.getReturnValue());
-                component.set("v.lastExpandedSectionId", null);
+                component.set("v.lastExpandedId", null);
                 component.set("v.availableFlights", response.getReturnValue());
             }
             else {
@@ -81,31 +81,77 @@
     },
 
     sectionExpand : function(component, event) {
-        var lastExpandedSectionId = component.get("v.lastExpandedSectionId");
+        //console.log("inside expand");
+        
+        var lastExpandedId = component.get("v.lastExpandedId");
+        //console.log("lastExpandedId: ",lastExpandedId);
 
-        var currentExpandedSectionId = 'section' + event.target.id;
-        var currentExpandedSection = document.getElementById(currentExpandedSectionId);
+        var currentExpandedId = event.target.id;
+        //console.log("currentExpandedId: ",currentExpandedId);
 
-        if (lastExpandedSectionId) {
-            console.log("last expanded element found")
-            var lastExpandedSection = document.getElementById(lastExpandedSectionId);
-            
-            if (lastExpandedSectionId == currentExpandedSectionId) {
-                if (currentExpandedSection.classList.contains("slds-is-open")) {
-                    currentExpandedSection.classList.remove("slds-is-open");
+
+        if (lastExpandedId) {
+            //console.log("lastExpandedId is present")
+            var lastExpandedButton = document.getElementById(lastExpandedId);
+            var lastExpandedSection = document.getElementById('section' + lastExpandedId);
+            var lastExpandedContent = document.getElementById('content' + lastExpandedId);
+
+            if (lastExpandedId == currentExpandedId) {
+                //console.log("lastExpandedId == currentExpandedId");
+
+                if (lastExpandedSection.classList.contains("slds-is-open")) {
+                    //console.log("lastExpandedId == currentExpandedId, already expanded");
+
+                    lastExpandedSection.classList.remove("slds-is-open");
+                    lastExpandedButton.setAttribute("aria-expanded", "false");
+                    lastExpandedContent.setAttribute("aria-hidden", "true");
+
+                    //console.log("lastExpandedId == currentExpandedId, shrinked it");
                     return;
                 }
                 else {
-                    currentExpandedSection.classList.add("slds-is-open");
+                    //console.log("lastExpandedId == currentExpandedId, already shrinked");
+
+                    lastExpandedSection.classList.add("slds-is-open");
+                    lastExpandedButton.setAttribute("aria-expanded", "true");
+                    lastExpandedContent.setAttribute("aria-hidden", "false");
+
+                    //console.log("lastExpandedId == currentExpandedId, expanded it");
                     return;
+                    
                 }
             }
 
+            //console.log("lastExpandedId != currentExpandedId, shrinking it");
+
             lastExpandedSection.classList.remove("slds-is-open");
+            lastExpandedButton.setAttribute("aria-expanded", "false");
+            lastExpandedContent.setAttribute("aria-hidden", "true");
+
+            //console.log("lastExpandedId != currentExpandedId, shrinked it");
         }
 
+        //console.log("referencing currentExpanded elements")
+
+        var currentExpandedButton = document.getElementById(currentExpandedId);
+        var currentExpandedSection = document.getElementById('section' + currentExpandedId);
+        var currentExpandedContent = document.getElementById('content' + currentExpandedId);
+
+        //console.log("done referencing currentExpanded elements")
+
+
+        //console.log("expanding new section");
+
         currentExpandedSection.classList.add("slds-is-open");
-        component.set("v.lastExpandedSectionId", currentExpandedSectionId);
+        currentExpandedButton.setAttribute("aria-expanded", "true");
+        currentExpandedContent.setAttribute("aria-hidden", "false");
+
+        //console.log("expanded new section");
+
+
+        //console.log("setting lastExpandedId = currentExpandedId");
+        component.set("v.lastExpandedId", currentExpandedId);
+        //console.log("done setting lastExpandedId = currentExpandedId");
     }
 
 
