@@ -28,7 +28,29 @@ public with sharing class SearchFlights {
     }
 
     @AuraEnabled
-    public static List<Fare__c> getFares(String flightId, String PassengerType){
-        return [SELECT Name, Price__c FROM Fare__c WHERE Flight__r.Id = :flightId AND Passenger_Type__c = :PassengerType];
+    public static Map<String, List<Fare__c>> getFares(String flightIds, String passengerType){
+        //flightIds = '["a015i00000VbyJoAAJ"]';
+        // deserialize JSON
+        try {
+            Type idArrType = Type.forName('List<String>');
+            List<String> flightIdList = (List<String>) JSON.deserialize(flightIds, idArrType);  
+            
+            Map<String, List<Fare__c>> flightFares = new Map<String, List<Fare__c>>();
+            for (String flightId : flightIdList) {
+                List<Fare__c> f = [SELECT Name, Price__c FROM Fare__c WHERE Flight__r.Id = :flightId AND Passenger_Type__c = :passengerType];
+                flightFares.put(flightId, f);
+            }
+
+            if (flightFares.size() > 0) {
+                return flightFares;
+            }
+            else {
+                return null;
+            } 
+
+        } catch (Exception e) {
+            throw new AuraHandledException(e.getMessage());
+        }
+        
     }
 }

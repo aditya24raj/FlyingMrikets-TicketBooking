@@ -67,9 +67,12 @@
 
         action.setCallback(this, function(response) {
             if (response.getState() == "SUCCESS") {
-                console.log(response.getReturnValue());
+                var flights = response.getReturnValue();
+                console.log("flights: ",flights);
                 component.set("v.lastExpandedId", null);
-                component.set("v.availableFlights", response.getReturnValue());
+                component.set("v.availableFlights", flights);
+                $A.enqueueAction(component.get("c.fetchFares"));
+
             }
             else {
                 alert("Error: failed to fetch available flights")
@@ -152,6 +155,51 @@
         //console.log("setting lastExpandedId = currentExpandedId");
         component.set("v.lastExpandedId", currentExpandedId);
         //console.log("done setting lastExpandedId = currentExpandedId");
+    },
+
+    fetchFares : function(component) {
+        //console.log("fetching fares: start");
+        
+        var fareAction = component.get("c.getFares");
+        //console.log("got reference to controller getFares");
+
+        var flights = component.get("v.availableFlights");
+
+        var flightIds = new Array();
+        for (var f of flights) {
+            flightIds.push(f.Id);
+        }
+
+        var flightIdsJSON = JSON.stringify(flightIds);
+
+        fareAction.setParams({
+            "flightIds" : flightIdsJSON,
+            "passengerType": component.find("selectPassengerType").get("v.value")
+
+        });
+
+        //console.log("fetching fare for: ", flightIdsJSON);
+        //console.log(`fetching for passenger type: ${component.find("selectPassengerType").get("v.value")}`);
+
+        fareAction.setCallback(this, function(fareResponse) {
+            //console.log("callback recieved");
+            if (fareResponse.getState() == "SUCCESS") {
+                console.log("fare: ", fareResponse.getReturnValue())
+                component.set("v.flightFare", fareResponse.getReturnValue());
+            }
+            else {
+                //console.log(fareResponse.getError()[0].message);
+                alert("Error: failed to fetch fare details")
+            }
+        });
+
+        //console.log("fareAction enqueued");
+        $A.enqueueAction(fareAction);
+        
+
+        /*
+        
+        */
     }
 
 

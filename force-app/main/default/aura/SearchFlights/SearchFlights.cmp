@@ -7,6 +7,7 @@
     <aura:attribute name="passengerTypes" type="String[]" default="['Adult', 'Children', 'Infant', 'Senior Citizen']"/>
     <aura:attribute name="availableFlights" type="Flight__c[]"/>
     <aura:attribute name="lastExpandedId" type="String"/>
+    <aura:attribute name="flightFare" type="Map"/>
         
     <!--card holding all the input fields & search button-->
     <lightning:card title="Search Flights" iconName="standard:search">
