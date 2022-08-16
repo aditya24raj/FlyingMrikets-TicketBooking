@@ -28,7 +28,7 @@ public with sharing class SearchFlights {
     }
 
     @AuraEnabled
-    public static Map<String, List<Fare__c>> getFares(String flightIds, String passengerType){
+    public static Map<String, List<Fare__c>> getFaresBak(String flightIds, String passengerType){
         //flightIds = '["a015i00000VbyJoAAJ"]';
         // deserialize JSON
         try {
@@ -53,4 +53,36 @@ public with sharing class SearchFlights {
         }
         
     }
+
+    @AuraEnabled
+    public static List<Fare__c> getFares(String flightId, String passengerType){
+        return [SELECT Name FROM Fare__c WHERE Flight__r.Id = :flightId AND Passenger_Type__c = :passengerType ORDER BY Price__c];
+    }
+
+    @AuraEnabled
+    public static void createBookingApex(
+        String passengerName,
+        String passengerEmail,
+        String onboardingFrom,
+        String arrivingTo,
+        String flightId,
+        String passengerType,
+        String fareId,
+        String paymentMode,
+        String foodType
+    ){
+        insert new Booking__c(
+            Passenger_Name__c = passengerName,
+            Passenger_Email__c = passengerEmail,
+            Onboarding_From__c = onboardingFrom,
+            Arriving_To__c = arrivingTo,
+            Flight_Name__c = flightId,
+            Passenger_Type__c = passengerType,
+            Fare_Type__c = fareId,
+            Payment_Mode__c = paymentMode,
+            Food_Type__c = foodType
+        );
+        
+    }
+
 }

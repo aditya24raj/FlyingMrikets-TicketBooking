@@ -5,18 +5,22 @@
 // You can also execute the entire file by running the command:
 //     SFDX: Execute Anonymous Apex with Editor Contents
 
-String flightIds = '["a015i00000VbyJoAAJ"]';
+String passengerName = 'aditya';
+String passengerEmail = 'aditya2400raj@gmail.com';
+String onboardingFrom = 'a005i000008Mv7iAAC';
+String arrivingTo = 'a005i000008BcDmAAK';
+String flightId = 'a015i00000VbyJoAAJ';
 String passengerType = 'Adult';
+String fareType = 'a045i000007LvnwAAC';
+String paymentMode = 'Google Pay';
 
-// deserialize JSON
-Type idArrType = Type.forName('List<string>');
-List<string> flightIdList = (List<string>) JSON.deserialize(flightIds, idArrType);
-
-Map<String, List<Fare__c>> flightFares = new Map<String, List<Fare__c>>();
-for (String flightId : flightIdList) {
-    List<Fare__c> f = [SELECT Name, Price__c FROM Fare__c WHERE Flight__r.Id = :flightId AND Passenger_Type__c = :passengerType];
-    flightFares.put(flightId, f);
-}
-
-system.debug(flightFares);
-system.debug(flightFares.size());
+insert new Booking__c(
+            Passenger_Name__c = passengerName,
+            Passenger_Email__c = passengerEmail,
+            Onboarding_From__c = onboardingFrom,
+            Arriving_To__c = arrivingTo,
+            Flight_Name__c = flightId,
+            Passenger_Type__c = passengerType,
+            Fare_Type__c = fareType,
+            Payment_Mode__c = paymentMode
+        );

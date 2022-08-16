@@ -71,8 +71,6 @@
                 console.log("flights: ",flights);
                 component.set("v.lastExpandedId", null);
                 component.set("v.availableFlights", flights);
-                $A.enqueueAction(component.get("c.fetchFares"));
-
             }
             else {
                 alert("Error: failed to fetch available flights")
@@ -83,15 +81,14 @@
         
     },
 
-    sectionExpand : function(component, event) {
+    sectionExpand : function(component, event, helper) {
         //console.log("inside expand");
-        
+
         var lastExpandedId = component.get("v.lastExpandedId");
         //console.log("lastExpandedId: ",lastExpandedId);
 
         var currentExpandedId = event.target.id;
         //console.log("currentExpandedId: ",currentExpandedId);
-
 
         if (lastExpandedId) {
             //console.log("lastExpandedId is present")
@@ -114,6 +111,9 @@
                 }
                 else {
                     //console.log("lastExpandedId == currentExpandedId, already shrinked");
+                    
+                    // expanding a section, fetch fare for it
+                    helper.fetchFares(component, lastExpandedId);
 
                     lastExpandedSection.classList.add("slds-is-open");
                     lastExpandedButton.setAttribute("aria-expanded", "true");
@@ -136,6 +136,9 @@
 
         //console.log("referencing currentExpanded elements")
 
+        // expanding a section, fetch fare for it
+        helper.fetchFares(component, currentExpandedId);
+
         var currentExpandedButton = document.getElementById(currentExpandedId);
         var currentExpandedSection = document.getElementById('section' + currentExpandedId);
         var currentExpandedContent = document.getElementById('content' + currentExpandedId);
@@ -151,60 +154,85 @@
 
         //console.log("expanded new section");
 
-
         //console.log("setting lastExpandedId = currentExpandedId");
         component.set("v.lastExpandedId", currentExpandedId);
         //console.log("done setting lastExpandedId = currentExpandedId");
     },
 
-    fetchFares : function(component) {
-        //console.log("fetching fares: start");
+    createBooking : function(component, event) {
+        console.log("inside booking");
+
+        // gather all required data to create booking
+        var passengerName = component.get("v.passengerName");
+        console.log("passengerName ", passengerName);
+
+        var passengerEmail = component.get("v.passengerEmail");
+        console.log("passengerEmail ", passengerEmail);
+
+        var onboardingFrom = component.find("selectFrom").get("v.value");
+        console.log("onboardingFrom", onboardingFrom);
+
+        var arrivingTo = component.find("selectTo").get("v.value");
+        console.log("arrivingTo", arrivingTo);
+
+        var passengerType = component.find("selectPassengerType").get("v.value");
+        console.log("passengerType", passengerType);
+
+        var foodType = component.find("foodType").get("v.value");
+        console.log("foodType", foodType);
+
+        var paymentMode = component.find("paymentMode").get("v.value");
+        console.log("paymentMode", paymentMode);
+
+        var buttonId = event.getSource().get("v.name").split("-");
         
-        var fareAction = component.get("c.getFares");
-        //console.log("got reference to controller getFares");
+        var flightId = buttonId[1];
+        console.log("flightId", flightId);
 
-        var flights = component.get("v.availableFlights");
+        var fareId = buttonId[0];
+        console.log("fareId", fareId);
 
-        var flightIds = new Array();
-        for (var f of flights) {
-            flightIds.push(f.Id);
-        }
-
-        var flightIdsJSON = JSON.stringify(flightIds);
-
-        fareAction.setParams({
-            "flightIds" : flightIdsJSON,
-            "passengerType": component.find("selectPassengerType").get("v.value")
-
+        // start booking process
+        // show flights
+        var action = component.get("c.createBookingApex");
+        action.setParams({
+            "passengerName": passengerName,
+            "passengerEmail": passengerEmail,
+            "onboardingFrom": onboardingFrom,
+            "arrivingTo": arrivingTo,
+            "flightId": flightId,
+            "passengerType": passengerType,
+            "fareId": fareId,
+            "paymentMode": paymentMode,
+            "foodType": foodType
         });
 
-        //console.log("fetching fare for: ", flightIdsJSON);
-        //console.log(`fetching for passenger type: ${component.find("selectPassengerType").get("v.value")}`);
-
-        fareAction.setCallback(this, function(fareResponse) {
-            //console.log("callback recieved");
-            if (fareResponse.getState() == "SUCCESS") {
-                console.log("fare: ", fareResponse.getReturnValue())
-                component.set("v.flightFare", fareResponse.getReturnValue());
+        action.setCallback(this, function(response) {
+            if (response.getState() == "SUCCESS") {
+                // toast showing booking created
+                var toastEvent = $A.get("e.force:showToast");
+                toastEvent.setParams({
+                    "type": "success",
+                    "mode": "dismissible",
+                    "title": "Success!",
+                    "message": "New booking created successfully"
+                });
+                toastEvent.fire();
             }
             else {
-                //console.log(fareResponse.getError()[0].message);
-                alert("Error: failed to fetch fare details")
+                // toast showing booking failed
+                var toastEvent = $A.get("e.force:showToast");
+                toastEvent.setParams({
+                    "type": "error",
+                    "mode": "dismissible",
+                    "title": "Failed!",
+                    "message": "Failed to create new booking"
+                });
+                toastEvent.fire();
             }
-        });
+        })
 
-        //console.log("fareAction enqueued");
-        $A.enqueueAction(fareAction);
-        
-
-        /*
-        
-        */
+        $A.enqueueAction(action);
     }
-
-
-
-
-    
 
 })

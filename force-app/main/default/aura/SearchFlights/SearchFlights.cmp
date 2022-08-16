@@ -8,7 +8,43 @@
     <aura:attribute name="availableFlights" type="Flight__c[]"/>
     <aura:attribute name="lastExpandedId" type="String"/>
     <aura:attribute name="flightFare" type="Map"/>
-        
+    <aura:attribute name="isModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="passengerName" type="String" />
+    <aura:attribute name="passengerEmail" type="String" />
+
+    <!--card holding passenger details & preferences-->
+    <lightning:card title="Passenger Details &amp; Preferences" iconName="standard:user">
+        <div  class="slds-grid slds-gutters" style="padding: 15px !important; margin-top: -10px !important">
+            <!--Passenger Name-->
+            <div class="slds-col">
+                <lightning:input name="passengerNameInput" value="{! v.passengerName }" label="Name" required="true"/>
+            </div>
+
+            <!--Passenger Email-->
+            <div class="slds-col">
+                <lightning:input type="email" name="passengerEmailInput" required="true" value="{! v.passengerEmail }" label="Email" />
+            </div>
+
+            <!--Food Preference-->
+            <div class="slds-col">
+                <lightning:select aura:id="foodType" label="Preferred Food">
+                    <option text="Veg" value="Veg"></option>
+                    <option text="Non-Veg" value="Non-Veg"></option>
+                </lightning:select>
+            </div>
+            
+            <!--Payment Mode-->
+            <div class="slds-col">
+                <lightning:select aura:id="paymentMode" label="Preferred Payment Method">
+                    <option text="Google Pay" value="Google Pay"></option>
+                    <option text="Phone Pe" value="Phone Pe"></option>
+                    <option text="Credit Card" value="Credit Card"></option>
+                    <option text="Debit Card" value="Debit Card"></option>
+                </lightning:select>
+            </div>
+        </div>
+    </lightning:card>
+
     <!--card holding all the input fields & search button-->
     <lightning:card title="Search Flights" iconName="standard:search">
         
@@ -39,7 +75,7 @@
 
             <!--Passenger Type-->
             <div class="slds-col">
-                <lightning:select aura:id="selectPassengerType" label="Passenger">
+                <lightning:select aura:id="selectPassengerType" label="Passenger" onchange="{!c.fetchFlights}">
                     <aura:iteration items="{!v.passengerTypes}" var="passengerType">
                         <option text="{!passengerType}" value="{!passengerType}"></option>
                     </aura:iteration>
@@ -57,26 +93,47 @@
 
         <!--list of expandable sections showing available flights-->
         <div style="padding: 15px !important; margin-top: -10px !important">
-            <aura:iteration items="{!v.availableFlights}" var="availableflight">
-                <div id="{!'section' + availableflight.Id}" class="slds-section">
+            <aura:iteration items="{!v.availableFlights}" var="availableFlight">
+                <div id="{!'section' + availableFlight.Id}" class="slds-section">
                     <h3 class="slds-section__title" style="border: 0.5px solid darkgrey; border-radius: 5px">
-                      <button id="{!availableflight.Id}" aria-controls="{!'content' + availableflight.Id}" aria-expanded="false" class="slds-button slds-section__title-action" onclick="{!c.sectionExpand}">
-                        <span class="slds-truncate" title="Section Title">
-                            <lightning:formattedDateTime class="departTime" value="{!availableflight.Depart_Time__c}" hour="2-digit" minute="2-digit"/> <span style="color:darkgrey !important">&nbsp;&nbsp; ●----{!availableflight.Duration__c}---->  &nbsp;&nbsp;</span> <lightning:formattedDateTime class="departTime" value="{!availableflight.Arrival_Time__c}" hour="2-digit" minute="2-digit"/> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span>{!availableflight.Name}</span>
+                      <button id="{!availableFlight.Id}" aria-controls="{!'content' + availableFlight.Id}" aria-expanded="false" class="slds-button slds-section__title-action" onclick="{!c.sectionExpand}">
+                        <span  title="Section Title">
+                            <!--departure time-->
+                            <lightning:formattedDateTime class="flightTime" value="{!availableFlight.Depart_Time__c}" hour="2-digit" minute="2-digit"/>
+                            <!--duration-->
+                            <span style="color:darkgrey !important">&nbsp;&nbsp; ●----{!availableFlight.Duration__c}---->  &nbsp;&nbsp;</span>
+                            <!--Arrival time--> 
+                            <lightning:formattedDateTime class="flightTime" value="{!availableFlight.Arrival_Time__c}" hour="2-digit" minute="2-digit"/>
+                            <!--flight number(name is autonumber)-->
+                            <span style="padding-left: 200px">{!availableFlight.Name}</span>
+                            <!--TODO: show save price-->
+
                         </span>
                       </button>
                     </h3>
-                    <div id="{!'content' + availableflight.Id}" aria-hidden="true" class="slds-section__content" style="border: 2px solid rgb(1,118, 211); border-radius: 5px; margin-top: 5px; padding: 10px">
-                      <p>Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                        Nullam quis risus eget urna mollis ornare vel eu leo. Nulla vitae elit libero, a pharetra augue.</p>
-                    </div>
+                    <div id="{!'content' + availableFlight.Id}" aria-hidden="true" class="slds-section__content" style="margin-bottom: 20px">
+                      <!--populate card of fare types-->
+                      <div class="slds-grid slds-gutters">
+                        <aura:iteration items="{!v.flightFare}" var="ff">
+                            <div class="slds-col">
+                                <lightning:card class="fareCard" variant="Narrow" title="{!ff.Name}" iconName="standard:asset_object">
+                                    <aura:set attribute="actions">
+                                        <lightning:button name="{! ff.Id + '-' + availableFlight.Id}" label="Book" title="Neutral action" onclick="{!c.createBooking}"/>
+                                    </aura:set>
+                                    <p class="slds-var-p-horizontal_small">
+                                        <lightning:recordViewForm recordId="{!ff.Id}" objectApiName="Everything__c">
+                                            <lightning:outputField fieldName="Price__c"/>
+                                            <lightning:outputField fieldName="Passenger_Type__c"/>
+                                            
+                                        </lightning:recordViewForm>
+                                    </p>
+                                </lightning:card>
+                            </div>
+                        </aura:iteration>
+                      </div>
+                    </div>  
                   </div>
             </aura:iteration>
         </div>
-
     </lightning:card>
-
-    
-
-
 </aura:component>	

@@ -1,7 +1,12 @@
-.THIS .departTime {
+.THIS .flightTime {
     font-weight: bold !important;
 }
 
 .THIS button > * {
     pointer-events: none;
+}
+
+.THIS .fareCard {
+    border: 1px solid rgb(1,118,211);
+    min-height: 100px;
 }
