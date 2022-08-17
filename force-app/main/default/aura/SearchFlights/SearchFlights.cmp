@@ -98,17 +98,20 @@
                     <h3 class="slds-section__title" style="border: 0.5px solid darkgrey; border-radius: 5px">
                       <button id="{!availableFlight.Id}" aria-controls="{!'content' + availableFlight.Id}" aria-expanded="false" class="slds-button slds-section__title-action" onclick="{!c.sectionExpand}">
                         <span  title="Section Title">
+                            <!--drop down icon-->
+                            <lightning:icon size="x-small" iconName="utility:chevrondown" alternativeText="seeFare" title="seeFare" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
                             <!--departure time-->
-                            <lightning:formattedDateTime class="flightTime" value="{!availableFlight.Depart_Time__c}" hour="2-digit" minute="2-digit"/>
+                            <lightning:formattedDateTime class="flightTime" value="{!availableFlight.Depart_Time__c}" hour="2-digit" minute="2-digit" timeZone="GMT"/>
                             <!--duration-->
                             <span style="color:darkgrey !important">&nbsp;&nbsp; ●----{!availableFlight.Duration__c}---->  &nbsp;&nbsp;</span>
                             <!--Arrival time--> 
-                            <lightning:formattedDateTime class="flightTime" value="{!availableFlight.Arrival_Time__c}" hour="2-digit" minute="2-digit"/>
+                            <lightning:formattedDateTime class="flightTime" value="{!availableFlight.Arrival_Time__c}" hour="2-digit" minute="2-digit" timeZone="GMT"/>
                             <!--flight number(name is autonumber)-->
                             <span style="padding-left: 200px">{!availableFlight.Name}</span>
-                            <!--TODO: show save price-->
+                            <!--TODO: show saver price-->
 
-                        </span>
+                        </span> 
                       </button>
                     </h3>
                     <div id="{!'content' + availableFlight.Id}" aria-hidden="true" class="slds-section__content" style="margin-bottom: 20px">

@@ -23,7 +23,7 @@ public with sharing class SearchFlights {
         return [
             SELECT Name, Depart_Time__c, Arrival_Time__c, Duration__c
               FROM Flight__c
-             WHERE Onboarding_From__r.Id = :airportFromId AND Arriving_To__r.Id = :airportToId
+             WHERE Onboarding_From__r.Id = :airportFromId AND Arriving_To__r.Id = :airportToId  AND Flight_Status__c = 'Approved'
         ];
     }
 
